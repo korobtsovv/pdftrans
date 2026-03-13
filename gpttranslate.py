@@ -80,7 +80,6 @@ def translate_pdf(input_pdf, output_pdf):
 
         for x, y, text, size, color in items:
 
-            # корректируем baseline
             y_corrected = y + size * 0.9
 
             page.insert_text(
