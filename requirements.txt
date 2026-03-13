@@ -1,0 +1,2 @@
+PyMuPDF>=1.23
+deep-translator>=1.11
