@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import fitz
 from deep_translator import GoogleTranslator
 
@@ -28,6 +29,59 @@ def translate(text):
 
     cache[text] = t
     return t
+
+
+def draw_compressed_text(page, x, y, text, size, color, compression):
+
+    cursor = x
+
+    for char in text:
+
+        page.insert_text(
+            (cursor, y),
+            char,
+            fontsize=size,
+            fontname="helv",
+            color=color
+        )
+
+        width = fitz.get_text_length(char, fontsize=size)
+
+        cursor += width * compression
+
+
+def draw_text_with_auto_compress(page, x, y, text, size, color):
+
+    page_width = page.rect.width
+
+    text_width = fitz.get_text_length(text, fontsize=size)
+
+    # если текст помещается
+    if x + text_width <= page_width:
+
+        page.insert_text(
+            (x, y),
+            text,
+            fontsize=size,
+            fontname="helv",
+            color=color
+        )
+        return
+
+    # варианты сжатия
+    compressions = [0.95, 0.92, 0.90, 0.88, 0.85]
+
+    for c in compressions:
+
+        width = sum(fitz.get_text_length(ch, fontsize=size) * c for ch in text)
+
+        if x + width <= page_width:
+
+            draw_compressed_text(page, x, y, text, size, color, c)
+            return
+
+    # максимум 15%
+    draw_compressed_text(page, x, y, text, size, color, 0.85)
 
 
 def translate_pdf(input_pdf, output_pdf):
@@ -74,7 +128,7 @@ def translate_pdf(input_pdf, output_pdf):
                     max(span["bbox"][3] for span in line["spans"])
                 )
 
-                page.add_redact_annot(rect, fill=(1,1,1))
+                page.add_redact_annot(rect, fill=(1, 1, 1))
 
         page.apply_redactions()
 
@@ -82,29 +136,61 @@ def translate_pdf(input_pdf, output_pdf):
 
             y_corrected = y + size * 0.9
 
-            page.insert_text(
-                (x, y_corrected),
+            draw_text_with_auto_compress(
+                page,
+                x,
+                y_corrected,
                 text,
-                fontsize=size,
-                fontname="helv",
-                color=color
+                size,
+                color
             )
 
     doc.save(output_pdf)
 
 
+def process_path(path):
+
+    if os.path.isfile(path):
+
+        if path.lower().endswith(".pdf"):
+
+            output_pdf = path.replace(".pdf", "_en.pdf")
+
+            print("Translating:", path)
+
+            translate_pdf(path, output_pdf)
+
+            print("Done:", output_pdf)
+
+    elif os.path.isdir(path):
+
+        for file in os.listdir(path):
+
+            if file.lower().endswith(".pdf"):
+
+                input_pdf = os.path.join(path, file)
+
+                output_pdf = os.path.join(
+                    path,
+                    file.replace(".pdf", "_en.pdf")
+                )
+
+                print("Translating:", input_pdf)
+
+                translate_pdf(input_pdf, output_pdf)
+
+                print("Done:", output_pdf)
+
+
 def main():
 
     if len(sys.argv) < 2:
-        print("Usage: python translate_pdf.py file.pdf")
+        print("Usage:")
+        print("python translate_pdf.py file.pdf")
+        print("python translate_pdf.py folder")
         return
 
-    input_pdf = sys.argv[1]
-    output_pdf = input_pdf.replace(".pdf", "_en.pdf")
-
-    translate_pdf(input_pdf, output_pdf)
-
-    print("Done:", output_pdf)
+    process_path(sys.argv[1])
 
 
 if __name__ == "__main__":
