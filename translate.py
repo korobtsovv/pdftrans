@@ -4,10 +4,17 @@
 import sys
 import os
 import fitz
+import logging
 from deep_translator import GoogleTranslator
 
 translator = GoogleTranslator(source="uk", target="en")
 cache = {}
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 def translate(text):
@@ -156,11 +163,11 @@ def process_path(path):
 
             output_pdf = path.replace(".pdf", "_en.pdf")
 
-            print("Translating:", path)
+            logger.info(f"Translating: {path}")
 
             translate_pdf(path, output_pdf)
 
-            print("Done:", output_pdf)
+            logger.info(f"Done: {output_pdf}")
 
     elif os.path.isdir(path):
 
@@ -175,11 +182,11 @@ def process_path(path):
                     file.replace(".pdf", "_en.pdf")
                 )
 
-                print("Translating:", input_pdf)
+                logger.info(f"Translating: {input_pdf}")
 
                 translate_pdf(input_pdf, output_pdf)
 
-                print("Done:", output_pdf)
+                logger.info(f"Done: {output_pdf}")
 
 
 def main():
