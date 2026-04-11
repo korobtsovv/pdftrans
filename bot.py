@@ -46,7 +46,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     tg_file = await context.bot.get_file(document.file_id)
     await tg_file.download_to_drive(input_path)
-    logger.info(f"Файл завантажено: {input_path}")
+    logger.info(f"Файл скачан: {input_path}")
 
     # Формируем имя выходного файла: report.pdf → report_en.pdf
     base_name = original_name[:-4]  # убираем .pdf
