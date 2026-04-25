@@ -35,7 +35,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Проверяем что это PDF
     if not document.file_name.lower().endswith(".pdf"):
-        await update.message.reply_text("⚠️ Будь ласка, завантажте файл у форматі PDF.")
+        await update.message.reply_text("⚠️ Пожалуйста, загрузите файл в формате PDF.")
         return
 
     await update.message.reply_text("⏳ Файл отримано, починаю переклад...❤️")
@@ -63,25 +63,25 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         if result.returncode != 0:
-            logger.error(f"Помилка скрипта: {result.stderr}")
+            logger.error(f"Ошибка скрипта: {result.stderr}")
             await update.message.reply_text(
-                f"❌ Скрипт завершився з помилкою:\n```\n{result.stderr[:1000]}\n```",
+                f"❌ Скрипт завершился с ошибкой:\n```\n{result.stderr[:1000]}\n```",
                 parse_mode="Markdown"
             )
             return
 
     except subprocess.TimeoutExpired:
-        await update.message.reply_text("❌ Перевищено час очікування (5 хвилин). Спробуйте файл меншого розміру.")
+        await update.message.reply_text("❌ Превышено время ожидания (5 минут). Попробуйте файл меньшего размера.")
         return
     except Exception as e:
-        await update.message.reply_text(f"❌ Несподівана помилка: {e}")
+        await update.message.reply_text(f"❌ Неожиданная ошибка: {e}")
         return
 
     # Проверяем что выходной файл создан
     if not os.path.exists(output_path):
         await update.message.reply_text(
-            f"❌ Скрипт не створив файл `{output_name}`. "
-            f"Переконайтеся, що скрипт зберігає результат у ту саму папку із суфіксом `_en`.",
+            f"❌ Скрипт не создал файл `{output_name}`. "
+            f"Убедитесь, что скрипт сохраняет результат в ту же папку с суффиксом `_en`.",
             parse_mode="Markdown"
         )
         return
