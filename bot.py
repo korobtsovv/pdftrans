@@ -59,7 +59,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Запускаем скрипт перевода
     try:
         result = subprocess.run(
-            ["python", SCRIPT_PATH, input_path],
+            ["/var/virtualenv/pdftrans/bin/python3", SCRIPT_PATH, input_path],
             capture_output=True,
             text=True,
             timeout=300  # 5 минут максимум
