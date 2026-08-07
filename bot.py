@@ -17,6 +17,9 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 logging.basicConfig(
+    filename="/var/log/pdftrans.log",
+    filemode="a",  # дописывать в конец файла
+    encoding="utf-8",
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
