@@ -27,7 +27,8 @@ import argparse
 import fitz          # PyMuPDF
 
 try:
-    from deep_translator import GoogleTranslator
+    # from deep_translator import GoogleTranslator
+    from deep_translator import MyMemoryTranslator
     HAS_DEEP_TRANSLATOR = True
 except ImportError:
     HAS_DEEP_TRANSLATOR = False
@@ -150,7 +151,8 @@ def _get_translator():
             raise ImportError(
                 "deep_translator is not installed. Run: pip install deep_translator"
             )
-        _online_translator = GoogleTranslator(source='uk', target='en')
+        # _online_translator = GoogleTranslator(source='uk', target='en')
+        _online_translator = MyMemoryTranslator(source="uk-UA", target="en-US")
     return _online_translator
 
 
